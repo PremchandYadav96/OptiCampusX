@@ -255,7 +255,7 @@ opticampus-x/
 
 - **V C Premchand Yadav** – Team Lead, Backend & AI
 - **P R Kiran Kumar Reddy** – Generalist & APIs
-- **Edupulapati Sai Praneeth** – AI/ML Specialist and API Integration
+- **Edupulapati Sai Praneeth** – AI & ML Specialist and API Integration
 - **Sanjana Pasam** –Full Stack Web Developer
 
 ---
