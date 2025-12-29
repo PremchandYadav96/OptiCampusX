@@ -31,11 +31,11 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
+      { url: "/opticampus-logo.png", type: "image/png" },
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/opticampus-icon.jpg", type: "image/png", sizes: "32x32" },
     ],
-    apple: "/opticampus-icon.jpg",
-    shortcut: "/opticampus-icon.jpg",
+    apple: "/opticampus-logo.png",
+    shortcut: "/opticampus-logo.png",
   },
 }
 

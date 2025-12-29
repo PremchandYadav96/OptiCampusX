@@ -31,22 +31,7 @@ interface AIResponse {
 export default function AIAnalysisPage() {
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [responses, setResponses] = useState<AIResponse[]>([
-    {
-      type: "analysis",
-      title: "VIT-AP Daily Resource Summary",
-      content:
-        "Based on today's data analysis, VIT-AP campus is operating at 78% resource efficiency. Key observations:\n\n• Electricity consumption across Academic Blocks 1-3 is 12% below predicted levels due to lower attendance\n• Water usage in MH-2 (Rabindranath Tagore Block) peaked at 12 PM, 8% above threshold - recommend investigating Floor 2\n• 5 anomalies detected requiring attention across campus\n• Central Library showing optimal utilization with zone-based cooling recommendation\n• Recommended daily savings potential: ₹5,000",
-      confidence: 94,
-    },
-    {
-      type: "recommendation",
-      title: "Priority Action for Academic Block-2",
-      content:
-        "Immediate Action Required: APJ Abdul Kalam Block Lab 3 shows unusual power consumption during non-operational hours (2:30 AM). This pattern has persisted for 3 days.\n\nRecommendation: Schedule maintenance inspection and verify equipment shutdown procedures. Estimated savings if resolved: ₹1,200/day.\n\nSecondary: SAC Gym Washroom shows continuous water flow pattern - potential leak detected.",
-      confidence: 89,
-    },
-  ])
+  const [responses, setResponses] = useState<AIResponse[]>([])
 
   const handleSubmit = async () => {
     if (!query.trim()) return

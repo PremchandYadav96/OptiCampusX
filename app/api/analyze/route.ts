@@ -4,7 +4,6 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google"
 export async function POST(req: Request) {
   const { query, context } = await req.json()
 
-  // Check for API key
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
   if (!apiKey) {
     return Response.json({
@@ -58,7 +57,7 @@ Guidelines:
 
   try {
     const { text } = await generateText({
-      model: google("gemini-2.5-flash-preview-05-20"),
+      model: google("gemini-2.0-flash-exp"),
       system: systemPrompt,
       prompt: query,
       maxOutputTokens: 2000,

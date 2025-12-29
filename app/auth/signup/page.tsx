@@ -12,7 +12,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Image from "next/image"
-import { Shield, User, Building2, BookOpen } from "lucide-react"
+import { Shield, User, Building2, BookOpen, Eye, EyeOff } from "lucide-react"
 
 const DEPARTMENTS = [
   "Computer Science & Engineering",
@@ -61,6 +61,8 @@ export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [fullName, setFullName] = useState("")
   const [regNumber, setRegNumber] = useState("")
   const [department, setDepartment] = useState("")
@@ -238,28 +240,46 @@ export default function SignupPage() {
                     <Label htmlFor="password" className="text-gray-300">
                       Password
                     </Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      required
-                      className="bg-black border-gray-800 text-white focus:border-emerald-500 focus:ring-emerald-500/20"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                        className="bg-black border-gray-800 text-white focus:border-emerald-500 focus:ring-emerald-500/20 pr-10"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid gap-2">
                     <Label htmlFor="confirmPassword" className="text-gray-300">
                       Confirm Password
                     </Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      required
-                      className="bg-black border-gray-800 text-white focus:border-emerald-500 focus:ring-emerald-500/20"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        required
+                        className="bg-black border-gray-800 text-white focus:border-emerald-500 focus:ring-emerald-500/20 pr-10"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   {error && <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg">{error}</div>}

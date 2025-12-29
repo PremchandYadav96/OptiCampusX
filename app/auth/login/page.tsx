@@ -11,7 +11,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Image from "next/image"
-import { Leaf, Zap, Droplets, ShieldCheck, Settings, Wrench, GraduationCap, Eye } from "lucide-react"
+import { Leaf, Zap, Droplets, ShieldCheck, Settings, Wrench, GraduationCap, Eye, EyeOff } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 const ROLES = [
@@ -57,6 +57,7 @@ export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -231,14 +232,23 @@ export default function LoginPage() {
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="h-11"
-                        />
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="h-11 pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
                       </div>
                       {error && (
                         <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg">{error}</div>
