@@ -164,11 +164,11 @@ export default function EvaluationPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="p-4 rounded-lg bg-black/50 font-mono text-center border border-white/5">
-                    <p className="text-white text-xl">{"$$z_i = \\frac{x_i - \\bar{x}}{s}$$"}</p>
+                    <p className="text-white text-xl">{"$$z_i = \\frac{x_i - \\mu}{\\sigma}$$"}</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    By monitoring real-time flow data against historical means (mu) and standard deviations (sigma), we
-                    flag any |Z| &gt; 3 as a critical anomaly (leak or wasteful usage).
+                    By monitoring real-time flow data against historical means ($\mu$) and standard deviations
+                    ($\sigma$), we flag any $|z| &gt; 3$ as a critical anomaly (leak or wasteful usage).
                   </p>
                 </CardContent>
               </Card>
@@ -184,7 +184,7 @@ export default function EvaluationPage() {
                 <CardContent className="space-y-4">
                   <div className="p-4 rounded-lg bg-black/50 font-mono text-center border border-white/5">
                     <p className="text-white text-lg">
-                      {"$$S_{caterer} = \\frac{\\sum_{i=1}^{m} w_i R_i}{\\sum_{j=1}^{k} \text{Log}(1 + f_j)}$$"}
+                      {"$$S_{caterer} = \\frac{\\sum_{i=1}^{m} w_i R_i}{\\sum_{j=1}^{k} \\log(1 + f_j)}$$"}
                     </p>
                   </div>
                   <p className="text-sm text-muted-foreground">
