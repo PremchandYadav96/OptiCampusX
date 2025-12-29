@@ -4,7 +4,7 @@
 
 <h1 align="center">OptiCampus-X</h1>
 
-<h3 align="center">
+<h3 align="center">.
 AI-Powered Smart Campus Resource Optimization Platform<br/>
 for <strong>VIT-AP University, Amaravati</strong>
 </h3>
