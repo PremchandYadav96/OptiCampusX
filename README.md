@@ -1,209 +1,276 @@
-# OptiCampus-X
+<p align="center">
+  <img src="https://i.ibb.co/PvZQ9RmM/OptiCampus-X.png" alt="OptiCampus-X Logo" width="220"/>
+</p>
 
-**AI-Powered Smart Campus Resource Optimization for VIT-AP University**
+<h1 align="center">OptiCampus-X</h1>
 
-OptiCampus-X is a comprehensive campus sustainability platform that leverages AI to optimize resource usage, track wastage, and promote environmental responsibility across VIT-AP University's campus in Amaravati.
+<h3 align="center">
+AI-Powered Smart Campus Resource Optimization Platform<br/>
+for <strong>VIT-AP University, Amaravati</strong>
+</h3>
 
-## About the Project
-
-OptiCampus-X is designed specifically for VIT-AP University to address genuine challenges of resource wastage, inefficient scheduling, and sustainability. The system monitors and optimizes resources across all major campus buildings including 3 Academic Blocks, 6 Men's Hostels, 4 Ladies' Hostels, and support facilities.
-
-### The Problem We Solve
-
-VIT-AP University faces significant challenges in resource management:
-
-- **Electricity Wastage**: Lights, ACs, and equipment running in unused spaces across 17+ buildings
-- **Water Wastage**: Leaks and overuse in 10 hostel blocks serving 5000+ students
-- **Underutilization**: 145+ classrooms and labs not efficiently scheduled
-- **Reactive Management**: No predictive system; decisions are manual and delayed
-
-### VIT-AP Campus Infrastructure
-
-**Academic Blocks:**
-- Academic Block-1 (Sarvepalli Radhakrishnan Block)
-- Central Block (Mahatma Gandhi Block)
-- Academic Block-2 (APJ Abdul Kalam Block)
-
-**Men's Hostels:** MH-1 (Sarojini Naidu), MH-2 (Rabindranath Tagore), MH-3 (Neelam Sanjiva Reddy), MH-4, MH-5, MH-6
-
-**Ladies' Hostels:** LH-1, LH-2, LH-3, LH-4
-
-**Support Facilities:** Student Activity Centre (SAC), Central Library, Main Cafeteria, VITRINA Guest House
-
-## Key Features
-
-### Resource Management
-- Real-time monitoring of electricity and water usage across 22+ campus buildings
-- Solar energy tracking and optimization
-- Predictive analytics for resource consumption using ARIMA and Prophet models
-- Anomaly detection using Z-score and Isolation Forest algorithms
-
-### Wastage Reporting & Accountability
-- **Water Leak Reports**: Students and staff can report water leaks with severity classification
-- **Food Wastage Tracking**: Monitor and report food wastage from 4 campus caterers (CRCL, Fusion, Zenith, Food Exo)
-- **Anonymous Reporting**: Option to report issues anonymously
-- **Photo Evidence**: Upload photos of wastage issues (stored in Redis via Upstash)
-- **Caterer Performance Metrics**: Transparent accountability scoring system
-
-### Gamification & Engagement
-- **Sustainability Credits**: Earn points for valid reports
-- **Leaderboard**: Campus-wide ranking system
-- **Badges & Achievements**: Recognition for top contributors
-- **Accuracy Tracking**: Monitor report verification rates
-
-### AI-Powered Analytics
-- **Google Gemini 2.5 Flash** integration for intelligent decision-making
-- Natural language queries for data insights
-- Predictive forecasting for resource needs
-- AI-generated executive reports with actionable recommendations
-- Converts quantitative optimization results into explainable policy decisions
-
-### Role-Based Access Control
-- **Super Admin**: Full system control
-- **Admin**: Campus management access
-- **Facility Manager**: Operations and maintenance
-- **Faculty**: Academic coordination and resource oversight
-- **Viewer**: Student access (default)
-
-## Core Technologies
-
-### Time-Series Forecasting
-Predict future resource demand using ARIMA and Prophet models with seasonal decomposition
-
-**Tech Stack**: Python, Prophet, statsmodels
-
-### Quantitative Optimization
-Linear programming-based scheduling to minimize costs while respecting constraints
-
-**Tech Stack**: PuLP, OR-Tools, NumPy
-
-### Anomaly Detection
-Z-score and Isolation Forest algorithms to detect unusual patterns and waste
-
-**Tech Stack**: scikit-learn, pandas
-
-### AI Decision Intelligence
-Gemini 2.5 Flash converts quantitative results into explainable policy decisions
-
-**Tech Stack**: Google Gemini API, AI SDK
-
-### Impact Measurement
-Real-time dashboards showing measurable savings in cost, resources, and carbon
-
-**Tech Stack**: Recharts, Real-time data
-
-## Tech Stack
-
-- **Framework**: Next.js 16 (App Router)
-- **Database**: Supabase (PostgreSQL) for authentication and core data
-- **Image Storage**: Redis (Upstash) for report photo evidence
-- **Authentication**: Supabase Auth with role-based access
-- **AI**: Google Gemini 2.5 Flash
-- **UI**: shadcn/ui + Tailwind CSS v4
-- **Charts**: Recharts
-- **Deployment**: Vercel
-
-## Measurable Impact
-
-- **Electricity Waste Reduction**: 25-35%
-- **Water Waste Reduction**: 15-25%
-- **Room Utilization Improvement**: +30%
-- **Monthly Cost Savings**: ₹40K-60K
-- **CO₂ Reduction**: 3+ tons/month
-
-## Getting Started
-
-### Quick Start (v0)
-
-This project runs directly in v0. Simply:
-
-1. Connect your Supabase integration
-2. Connect your Upstash for Redis integration
-3. Run the SQL scripts in `/scripts` folder (in order: 001, 002, 003, 004, 005)
-4. Add your `GEMINI_API_KEY` environment variable
-5. Add `NEXT_PUBLIC_SUPER_ADMIN_EMAIL` for super admin access
-6. Sign up and start using!
-
-### Detailed Setup
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for comprehensive setup instructions.
-
-## Project Structure
-
-```
-opticampus-x/
-├── app/                      # Next.js app router pages
-│   ├── auth/                 # Authentication pages (login/signup)
-│   ├── dashboard/            # Main dashboard
-│   ├── report/               # Wastage reporting
-│   ├── leaderboard/          # Gamification system
-│   ├── caterers/             # Caterer accountability
-│   ├── admin/                # Admin panel with export functionality
-│   ├── ai-analysis/          # AI Decision Intelligence (Gemini)
-│   ├── about/                # Project information
-│   └── api/                  # API routes
-├── components/               # React components
-│   ├── ui/                   # shadcn/ui components
-│   ├── dashboard/            # Dashboard-specific
-│   ├── reports/              # Reporting forms
-│   ├── admin/                # Admin dashboard components
-│   └── profile/              # User profile
-├── lib/                      # Utilities
-│   ├── supabase/             # Supabase client setup
-│   ├── redis-storage.ts      # Redis image storage utilities
-│   └── types.ts              # TypeScript definitions
-├── scripts/                  # SQL migration scripts
-│   ├── 001-create-tables.sql
-│   ├── 002-rls-policies.sql
-│   ├── 003-seed-data.sql
-│   ├── 004-fix-auth-final.sql
-│   └── 005-fix-role-based-signup.sql
-└── public/                   # Static assets
-```
-
-## Database Schema
-
-### Key Tables
-- `profiles` - User accounts with roles and sustainability credits
-- `buildings` - 22 campus buildings with capacity and solar data
-- `caterers` - 4 mess caterers with performance metrics
-- `water_leak_reports` - Water wastage reports with severity levels
-- `food_wastage_reports` - Food wastage with caterer accountability
-- `resource_usage_logs` - Historical usage data for forecasting
-- `optimization_schedules` - AI-generated optimization schedules
-- `ai_analysis_logs` - AI query history and decisions
-
-## Role of Google Gemini 2.5 Flash
-
-Unlike typical AI projects that use LLMs for everything, OptiCampus-X uses Gemini strategically as a **Decision Intelligence Agent**:
-
-- **Converts Numbers to Policies**: Transforms optimization outputs into human-readable action plans for VIT-AP administrators
-- **Explains Decisions**: Provides justification for why specific optimizations are recommended
-- **Risk & Exception Handling**: Identifies edge cases and alerts on situations requiring human attention
-- **Executive Reporting**: Generates professional summaries for stakeholders automatically
-
-## Team
-
-- **V C Premchand Yadav** - Team Leader, Backend Development & AI Integration
-- **P R Kiran Kumar Reddy (Kiran)** - Generalist, Supabase & API Integration
-- **Edupulapati Sai Praneeth** - AI/ML/DL Specialist
-- **Sanjana Pasam** - Web Developer
-
-## Contributing
-
-This is an academic project for VIT-AP University and Google Solution Challenge 2025. For suggestions or improvements, contact the development team.
-
-## License
-
-Academic Project - VIT-AP University
-
-## Future Roadmap
-
-- **Google Cloud IoT Core**: Integration with campus-wide hardware sensors for direct real-time data ingestion
-- **BigQuery & Looker**: Advanced data warehousing and business intelligence for multi-year sustainability trends
-- **Vertex AI**: Moving from API calls to custom-tuned models for specific VIT-AP resource usage patterns
-- **Google Maps Platform**: Enhanced spatial analysis for water leak detection using advanced geospatial APIs
+<p align="center">
+  <img src="https://img.shields.io/badge/AI-Google%20Gemini%202.5%20Flash-blueviolet"/>
+  <img src="https://img.shields.io/badge/Optimization-Linear%20Programming-success"/>
+  <img src="https://img.shields.io/badge/Forecasting-ARIMA%20%7C%20Prophet-informational"/>
+  <img src="https://img.shields.io/badge/Framework-Next.js%2016-black"/>
+  <img src="https://img.shields.io/badge/Database-Supabase-green"/>
+  <img src="https://img.shields.io/badge/Deployment-Vercel-black"/>
+</p>
 
 ---
 
-**Built for VIT-AP University | Powered by Google Gemini 2.5 Flash | Designed for Sustainability**
+## 🌍 Vision
+
+**OptiCampus-X** is an **AI-driven sustainability and optimization system** designed to **quantitatively minimize resource wastage** and **maximize utilization efficiency** across VIT-AP University’s campus infrastructure.
+
+Unlike traditional dashboards, OptiCampus-X **models the campus as a constrained optimization problem**, using **forecasting, anomaly detection, and mathematical programming**, with **Google Gemini acting as a Decision Intelligence layer**.
+
+---
+
+## 🚨 Problem Statement (Quantified)
+
+VIT-AP University operates at large scale:
+
+| Metric | Scale |
+|------|------|
+| Academic Buildings | 3 |
+| Hostels | 10 (6 Men + 4 Ladies) |
+| Total Buildings Monitored | **22+** |
+| Classrooms & Labs | **145+** |
+| Students Served | **5000+** |
+
+### Core Inefficiencies
+❌ Electricity running in unused rooms  
+❌ Undetected water leakages across hostels  
+❌ Food overproduction by caterers  
+❌ Manual scheduling without utilization awareness  
+❌ No predictive or optimization-based decision system  
+
+---
+
+## 🏛️ Campus Infrastructure Modeled
+
+### 📚 Academic Blocks
+- Sarvepalli Radhakrishnan Block (AB-1)
+- Mahatma Gandhi Central Block
+- APJ Abdul Kalam Block (AB-2)
+
+### 🏠 Hostels
+**Men:** MH-1 to MH-6  
+**Ladies:** LH-1 to LH-4  
+
+### 🏢 Facilities
+- Student Activity Centre (SAC)
+- Central Library
+- Main Cafeteria
+- VITRINA Guest House
+
+Each building is **numerically modeled** with:
+- Capacity constraints
+- Energy baseline
+- Water demand
+- Solar contribution
+- Temporal usage patterns
+
+---
+
+## ⚙️ System Architecture
+
+```text
+IoT / Logs / Reports
+↓
+Time-Series Forecasting
+↓
+Anomaly Detection
+↓
+Optimization Engine (LP)
+↓
+AI Decision Intelligence (Gemini)
+↓
+Dashboards & Policy Actions
+```
+
+---
+
+## 🧠 Core AI & Optimization Techniques
+
+### 📈 Time-Series Forecasting
+**Objective:** Predict short-term and seasonal demand
+
+**Models Used**
+- ARIMA (Auto-Regressive Integrated Moving Average)
+- Facebook Prophet (trend + seasonality + holidays)
+
+**Applications**
+- Electricity demand prediction
+- Water consumption forecasting
+- Peak load anticipation
+
+---
+
+### 🚨 Anomaly Detection
+**Objective:** Detect abnormal resource behavior
+
+**Algorithms**
+- Z-Score Statistical Deviation
+- Isolation Forest (unsupervised)
+
+**Use Cases**
+- Sudden water leaks
+- Power spikes in idle rooms
+- Abnormal caterer wastage
+
+📊 Reduces false positives while maintaining high recall.
+
+---
+
+### 📐 Quantitative Optimization Engine
+**Objective:** Minimize resource cost while satisfying constraints
+
+**Method**
+- Linear Programming (LP)
+- Mixed-Integer Programming (MIP)
+
+**Solvers**
+- PuLP
+- Google OR-Tools
+
+**Optimization Variables**
+- Room allocations
+- Time slots
+- Energy loads
+- Solar offsets
+
+**Constraints**
+- Capacity
+- Academic schedules
+- Operational hours
+- Maintenance windows
+
+---
+
+### 🤖 AI Decision Intelligence (Gemini 2.5 Flash)
+
+Gemini is **not used as a chatbot**, but as a **Decision Translator**.
+
+✅ Converts optimization outputs into:
+- Administrative policies
+- Facility manager instructions
+- Risk alerts & exceptions
+- Executive-ready reports
+
+📌 Example:
+> “Shifting 3 classes from AB-1 to Central Block between 2–4 PM reduces electricity load by 18% without affecting capacity.”
+
+---
+
+## 🎯 Key Features
+
+### 🔌 Resource Optimization
+- Real-time electricity & water monitoring
+- Solar utilization tracking
+- Predictive consumption modeling
+- Cost-aware scheduling
+
+### 🚿 Wastage Reporting System
+- Water leak severity classification
+- Food wastage tracking (4 caterers)
+- Anonymous reports
+- Photo evidence (Upstash Redis)
+
+### 🏆 Gamification & Engagement
+- Sustainability credits
+- Campus leaderboard
+- Accuracy-based reputation
+- Badges & achievements
+
+### 🔐 Role-Based Access Control
+- Super Admin
+- Admin
+- Facility Manager
+- Faculty
+- Student (Viewer)
+
+---
+
+## 📊 Measurable Impact (Pilot Estimates)
+
+| Metric | Improvement |
+|------|------------|
+| Electricity Waste | **↓ 25–35%** |
+| Water Waste | **↓ 15–25%** |
+| Room Utilization | **↑ 30%** |
+| Monthly Cost Savings | **₹40K–60K** |
+| CO₂ Reduction | **3+ tons/month** |
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|----|----|
+| Frontend | Next.js 16 (App Router) |
+| UI | Tailwind CSS v4 + shadcn/ui |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| AI | Google Gemini 2.5 Flash |
+| Optimization | PuLP, OR-Tools |
+| ML | Prophet, statsmodels, scikit-learn |
+| Storage | Upstash Redis |
+| Charts | Recharts |
+| Deployment | Vercel |
+
+---
+
+## 📁 Project Structure
+
+```text
+opticampus-x/
+├── app/              # Next.js App Router (Pages & Layouts)
+├── components/       # Reusable UI Components
+├── lib/              # Core Logic (Supabase, AI, Utils)
+├── scripts/          # Python Optimization & ML Scripts
+└── public/           # Static Assets
+```
+
+(Optimized for scalability and RBAC security)
+
+---
+
+## 🚀 Getting Started (v0)
+
+1. Connect Supabase
+2. Connect Upstash Redis
+3. Run SQL scripts (001 → 005)
+4. Add `GEMINI_API_KEY`
+5. Set `NEXT_PUBLIC_SUPER_ADMIN_EMAIL`
+6. Deploy on Vercel
+
+📘 See `DEPLOYMENT.md` for full setup.
+
+---
+
+## 👥 Team
+
+- **V C Premchand Yadav** – Team Lead, Backend & AI
+- **P R Kiran Kumar Reddy** – Supabase & APIs
+- **Edupulapati Sai Praneeth** – AI/ML Specialist
+- **Sanjana Pasam** – Web Developer
+
+---
+
+## 🔮 Future Roadmap
+
+- Google Cloud IoT Core (sensor integration)
+- BigQuery + Looker dashboards
+- Vertex AI custom models
+- Google Maps geospatial leak analysis
+
+---
+
+<p align="center">
+<strong>Built for VIT-AP University 🌱-As part of GDG TECHSPRINT</strong><br/>
+<strong>Powered by Google Gemini 2.5 Flash 🤖</strong><br/>
+<strong>Designed for Sustainable Impact ♻️</strong>
+</p>
