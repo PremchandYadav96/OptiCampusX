@@ -21,6 +21,7 @@ import {
   Brain,
   Info,
   UtensilsCrossed,
+  HelpCircle,
 } from "lucide-react"
 import { useState } from "react"
 import { useUser } from "@/hooks/use-user"
@@ -49,6 +50,7 @@ const getNavItems = (role: string | null) => {
   const analyticsItems = [
     { href: "/forecasting", label: "Forecasting", icon: TrendingUp },
     { href: "/optimization", label: "Optimization", icon: Settings },
+    { href: "/optimization/how-it-works", label: "How It Works", icon: HelpCircle },
     { href: "/ai-analysis", label: "AI Analysis", icon: Brain },
   ]
 

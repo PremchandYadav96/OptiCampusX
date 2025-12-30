@@ -9,10 +9,19 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { optimizationSchedule } from "@/lib/sample-data"
 import { useState } from "react"
-import { Settings2, Play, Zap, Droplets, Building2, Leaf, MapPin, CheckCircle2 } from "lucide-react"
-import { toast } from "react-toastify"
+import { Settings2, Zap, Droplets, Building2, Leaf, MapPin, CheckCircle2, Loader2, Sparkles } from "lucide-react"
+import { toast } from "sonner"
+
+interface OptimizationAction {
+  id?: string
+  resource: string
+  location: string
+  currentStatus: string
+  recommendedAction: string
+  savings: string
+  reason: string
+}
 
 export default function OptimizationPage() {
   const [costWeight, setCostWeight] = useState([60])
@@ -20,11 +29,10 @@ export default function OptimizationPage() {
   const [comfortEnabled, setComfortEnabled] = useState(true)
   const [autoMode, setAutoMode] = useState(false)
   const [appliedActions, setAppliedActions] = useState<string[]>([])
-
-  const totalSavings = optimizationSchedule.reduce((acc, item) => {
-    const num = Number.parseInt(item.savings.replace(/[₹,]/g, ""))
-    return acc + num
-  }, 0)
+  const [isOptimizing, setIsOptimizing] = useState(false)
+  const [optimizationSchedule, setOptimizationSchedule] = useState<OptimizationAction[]>([])
+  const [totalSavings, setTotalSavings] = useState(0)
+  const [usedModel, setUsedModel] = useState<string>("Not yet run")
 
   const applyAction = (id: string) => {
     if (!appliedActions.includes(id)) {
@@ -39,18 +47,67 @@ export default function OptimizationPage() {
   }
 
   const handleRunOptimization = async () => {
-    const loadingToast = toast.loading("Running OptiCampus-X LP Solver...", {
-      description: "Analyzing 17+ VIT-AP buildings for optimal resource allocation",
+    setIsOptimizing(true)
+
+    const loadingToast = toast.loading("Running OptiCampus-X Optimization Engine...", {
+      description: "Analyzing 17+ VIT-AP buildings with AI",
     })
 
-    // Simulate optimization process
-    await new Promise((resolve) => setTimeout(resolve, 2500))
+    try {
+      console.log("[v0] Starting optimization with params:", {
+        costWeight: costWeight[0],
+        sustainabilityWeight: sustainabilityWeight[0],
+        comfortEnabled,
+      })
 
-    toast.dismiss(loadingToast)
-    toast.success("Optimization complete!", {
-      description: `Potential savings: ₹${totalSavings.toLocaleString()}/day identified across campus`,
-      duration: 6000,
-    })
+      const response = await fetch("/api/optimize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          costWeight: costWeight[0],
+          sustainabilityWeight: sustainabilityWeight[0],
+          comfortEnabled,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.error) {
+        toast.dismiss(loadingToast)
+        toast.error("Optimization Failed", {
+          description: data.error,
+        })
+      } else {
+        const scheduleWithIds = data.schedule.map((action: OptimizationAction, index: number) => ({
+          ...action,
+          id: `opt-${index + 1}`,
+        }))
+
+        setOptimizationSchedule(scheduleWithIds)
+        setTotalSavings(data.totalSavings)
+        setUsedModel(data.model)
+
+        toast.dismiss(loadingToast)
+        toast.success("Optimization Complete!", {
+          description: `${scheduleWithIds.length} actions generated. Potential savings: ₹${data.totalSavings.toLocaleString()}/day`,
+          duration: 6000,
+        })
+
+        console.log("[v0] Optimization successful:", {
+          actions: scheduleWithIds.length,
+          totalSavings: data.totalSavings,
+          model: data.model,
+        })
+      }
+    } catch (error) {
+      console.error("[v0] Optimization error:", error)
+      toast.dismiss(loadingToast)
+      toast.error("Optimization Error", {
+        description: "Failed to connect to optimization service. Please check your API configuration.",
+      })
+    } finally {
+      setIsOptimizing(false)
+    }
   }
 
   return (
@@ -68,22 +125,29 @@ export default function OptimizationPage() {
                 </Badge>
               </div>
               <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight">
-                Resource Optimization
+                AI Resource Optimization
               </h1>
-              <p className="text-muted-foreground mt-1">
-                Linear programming-based scheduling for VIT-AP campus buildings
-              </p>
+              <p className="text-muted-foreground mt-1">AI-powered scheduling for VIT-AP campus buildings</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <Switch id="auto-mode" checked={autoMode} onCheckedChange={setAutoMode} />
+                <Switch id="auto-mode" checked={autoMode} onCheckedChange={setAutoMode} disabled={isOptimizing} />
                 <Label htmlFor="auto-mode" className="text-sm">
                   Auto-Apply
                 </Label>
               </div>
-              <Button className="gap-2" onClick={handleRunOptimization}>
-                <Play className="h-4 w-4" />
-                Run Optimization
+              <Button className="gap-2" onClick={handleRunOptimization} disabled={isOptimizing}>
+                {isOptimizing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Optimizing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    Run AI Optimization
+                  </>
+                )}
               </Button>
             </div>
           </div>
@@ -105,7 +169,7 @@ export default function OptimizationPage() {
                   <Label className="text-sm">Cost Minimization</Label>
                   <span className="text-sm font-medium">{costWeight}%</span>
                 </div>
-                <Slider value={costWeight} onValueChange={setCostWeight} max={100} step={5} />
+                <Slider value={costWeight} onValueChange={setCostWeight} max={100} step={5} disabled={isOptimizing} />
               </div>
 
               <div className="space-y-3">
@@ -113,7 +177,13 @@ export default function OptimizationPage() {
                   <Label className="text-sm">Sustainability Priority</Label>
                   <span className="text-sm font-medium">{sustainabilityWeight}%</span>
                 </div>
-                <Slider value={sustainabilityWeight} onValueChange={setSustainabilityWeight} max={100} step={5} />
+                <Slider
+                  value={sustainabilityWeight}
+                  onValueChange={setSustainabilityWeight}
+                  max={100}
+                  step={5}
+                  disabled={isOptimizing}
+                />
               </div>
 
               <div className="flex items-center justify-between py-3 border-t">
@@ -121,7 +191,7 @@ export default function OptimizationPage() {
                   <Label className="text-sm">Comfort Constraints</Label>
                   <p className="text-xs text-muted-foreground">Maintain student comfort levels</p>
                 </div>
-                <Switch checked={comfortEnabled} onCheckedChange={setComfortEnabled} />
+                <Switch checked={comfortEnabled} onCheckedChange={setComfortEnabled} disabled={isOptimizing} />
               </div>
 
               <div className="pt-3 border-t">
@@ -139,6 +209,16 @@ export default function OptimizationPage() {
                   <Badge variant="outline">Library Hours</Badge>
                 </div>
               </div>
+
+              <div className="pt-3 border-t">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">AI Model</span>
+                  <Badge variant="secondary" className="text-xs">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {usedModel}
+                  </Badge>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -146,9 +226,7 @@ export default function OptimizationPage() {
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg">VIT-AP Optimization Results</CardTitle>
-              <CardDescription>
-                Objective: Minimize (Energy_Cost + Water_Cost + Idle_Penalty + Carbon_Penalty)
-              </CardDescription>
+              <CardDescription>AI-generated resource schedule for maximum efficiency</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
@@ -178,9 +256,15 @@ export default function OptimizationPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold">Total Estimated Daily Savings for VIT-AP</h4>
-                    <p className="text-sm text-muted-foreground">Based on current optimization schedule</p>
+                    <p className="text-sm text-muted-foreground">
+                      {optimizationSchedule.length > 0
+                        ? `${optimizationSchedule.length} AI-generated optimization actions`
+                        : "Run optimization to generate schedule"}
+                    </p>
                   </div>
-                  <span className="text-3xl font-bold text-primary">₹{totalSavings.toLocaleString()}</span>
+                  <span className="text-3xl font-bold text-primary">
+                    {totalSavings > 0 ? `₹${totalSavings.toLocaleString()}` : "—"}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -191,57 +275,72 @@ export default function OptimizationPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">VIT-AP Optimization Schedule</CardTitle>
-            <CardDescription>Recommended actions for Academic Blocks, Hostels, and Support Facilities</CardDescription>
+            <CardDescription>
+              {optimizationSchedule.length > 0
+                ? "AI-recommended actions for Academic Blocks, Hostels, and Support Facilities"
+                : "Click 'Run AI Optimization' to generate intelligent recommendations"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Resource</TableHead>
-                  <TableHead>VIT-AP Location</TableHead>
-                  <TableHead>Current</TableHead>
-                  <TableHead>Recommendation</TableHead>
-                  <TableHead>Reason</TableHead>
-                  <TableHead className="text-right">Savings</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {optimizationSchedule.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.resource}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p>{item.location.split("(")[0].trim()}</p>
-                        {item.location.includes("(") && (
-                          <p className="text-xs text-muted-foreground">
-                            ({item.location.split("(")[1].replace(")", "")})
-                          </p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{item.currentStatus}</Badge>
-                    </TableCell>
-                    <TableCell className="text-primary font-medium">{item.recommendedAction}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground max-w-[200px]">{item.reason}</TableCell>
-                    <TableCell className="text-right font-semibold text-green-600">{item.savings}</TableCell>
-                    <TableCell className="text-right">
-                      {appliedActions.includes(item.id) ? (
-                        <Badge className="gap-1">
-                          <CheckCircle2 className="h-3 w-3" />
-                          Applied
-                        </Badge>
-                      ) : (
-                        <Button size="sm" variant="outline" onClick={() => applyAction(item.id)}>
-                          Apply
-                        </Button>
-                      )}
-                    </TableCell>
+            {optimizationSchedule.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Resource</TableHead>
+                    <TableHead>VIT-AP Location</TableHead>
+                    <TableHead>Current</TableHead>
+                    <TableHead>Recommendation</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead className="text-right">Savings</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {optimizationSchedule.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.resource}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p>{item.location.split("(")[0].trim()}</p>
+                          {item.location.includes("(") && (
+                            <p className="text-xs text-muted-foreground">
+                              ({item.location.split("(")[1].replace(")", "")})
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{item.currentStatus}</Badge>
+                      </TableCell>
+                      <TableCell className="text-primary font-medium">{item.recommendedAction}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground max-w-[200px]">{item.reason}</TableCell>
+                      <TableCell className="text-right font-semibold text-green-600">{item.savings}</TableCell>
+                      <TableCell className="text-right">
+                        {appliedActions.includes(item.id || "") ? (
+                          <Badge className="gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Applied
+                          </Badge>
+                        ) : (
+                          <Button size="sm" variant="outline" onClick={() => applyAction(item.id || "")}>
+                            Apply
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="mb-2">No optimization schedule generated yet</p>
+                <p className="text-sm">
+                  Click the "Run AI Optimization" button above to analyze your campus and generate intelligent
+                  recommendations
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -258,36 +357,38 @@ export default function OptimizationPage() {
                 <p className="pl-4 text-primary">w₃ × Idle_Room_Penalty + w₄ × Carbon_Penalty</p>
               </div>
               <p className="text-sm text-muted-foreground mt-4">
-                Optimized for VIT-AP's 17+ buildings including 3 Academic Blocks, 10 Hostels, and 4 Support Facilities.
-                Using Linear Programming solver (PuLP).
+                AI-optimized for VIT-AP's 17+ buildings including 3 Academic Blocks, 10 Hostels, and 4 Support
+                Facilities. Powered by {usedModel}.
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Solver Statistics</CardTitle>
+              <CardTitle className="text-lg">AI Engine Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Solver Type</span>
-                <Badge>CBC (COIN-OR)</Badge>
+                <span className="text-sm text-muted-foreground">AI Model</span>
+                <Badge>{usedModel}</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Variables</span>
-                <span className="text-sm font-medium">248</span>
+                <span className="text-sm text-muted-foreground">Status</span>
+                <Badge variant={isOptimizing ? "secondary" : "outline"}>{isOptimizing ? "Running" : "Ready"}</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Constraints</span>
-                <span className="text-sm font-medium">156</span>
+                <span className="text-sm text-muted-foreground">Actions Generated</span>
+                <span className="text-sm font-medium">{optimizationSchedule.length}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Solution Time</span>
-                <span className="text-sm font-medium">0.34s</span>
+                <span className="text-sm text-muted-foreground">Total Savings</span>
+                <span className="text-sm font-medium text-green-600">
+                  {totalSavings > 0 ? `₹${totalSavings.toLocaleString()}/day` : "—"}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Optimality Gap</span>
-                <span className="text-sm font-medium text-green-600">0.0%</span>
+                <span className="text-sm text-muted-foreground">Mode</span>
+                <span className="text-sm font-medium">{autoMode ? "Auto-Apply" : "Manual Review"}</span>
               </div>
             </CardContent>
           </Card>

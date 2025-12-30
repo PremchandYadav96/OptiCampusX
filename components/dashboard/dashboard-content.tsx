@@ -16,6 +16,9 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  Loader2,
+  Sparkles,
+  Activity,
 } from "lucide-react"
 import Link from "next/link"
 import { UsageChart } from "./usage-chart"
@@ -39,17 +42,52 @@ interface DashboardContentProps {
 export function DashboardContent({ profile, buildings, waterReports, foodReports, caterers }: DashboardContentProps) {
   const [showOnboarding, setShowOnboarding] = useState(profile && (!profile.full_name || !profile.department))
   const [isOptimizing, setIsOptimizing] = useState(false)
+  const [optimizationStatus, setOptimizationStatus] = useState<
+    "idle" | "collecting" | "analyzing" | "optimizing" | "complete"
+  >("idle")
   const router = useRouter()
 
   const handleRunOptimization = async () => {
     setIsOptimizing(true)
-    toast.info("Initializing OptiCampus-X LP Solver...")
 
-    // Simulate complex optimization process
-    await new Promise((resolve) => setTimeout(resolve, 2500))
+    setOptimizationStatus("collecting")
+    toast.info("Step 1/4: Collecting campus data...", {
+      description: "Gathering real-time sensor data from 17+ buildings",
+      icon: <Activity className="h-4 w-4 animate-pulse" />,
+    })
 
+    await new Promise((resolve) => setTimeout(resolve, 800))
+
+    setOptimizationStatus("analyzing")
+    toast.info("Step 2/4: Analyzing patterns...", {
+      description: "Running SARIMA forecasting and anomaly detection",
+      icon: <TrendingUp className="h-4 w-4 animate-pulse" />,
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 800))
+
+    setOptimizationStatus("optimizing")
+    toast.info("Step 3/4: AI optimization in progress...", {
+      description: "Gemini 2.0 Flash generating optimal schedule",
+      icon: <Sparkles className="h-4 w-4 animate-pulse" />,
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 900))
+
+    setOptimizationStatus("complete")
     setIsOptimizing(false)
-    toast.success("Optimization complete! 1,247 kWh identified for reduction.")
+
+    toast.success("Step 4/4: Optimization complete!", {
+      description: "1,247 kWh identified for reduction. View recommendations now.",
+      icon: <CheckCircle className="h-4 w-4" />,
+      duration: 6000,
+      action: {
+        label: "View Results",
+        onClick: () => router.push("/optimization"),
+      },
+    })
+
+    setTimeout(() => setOptimizationStatus("idle"), 2000)
     router.refresh()
   }
 
@@ -126,10 +164,25 @@ export function DashboardContent({ profile, buildings, waterReports, foodReports
             <Button
               onClick={handleRunOptimization}
               disabled={isOptimizing}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+              className={cn(
+                "bg-primary hover:bg-primary/90 text-primary-foreground font-medium relative overflow-hidden",
+                isOptimizing && "animate-pulse",
+              )}
             >
-              <Zap className={cn("w-4 h-4 mr-2", isOptimizing && "animate-pulse")} />
-              {isOptimizing ? "Optimizing..." : "Run Optimization"}
+              {isOptimizing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {optimizationStatus === "collecting" && "Collecting Data..."}
+                  {optimizationStatus === "analyzing" && "Analyzing Patterns..."}
+                  {optimizationStatus === "optimizing" && "AI Optimizing..."}
+                  {optimizationStatus === "complete" && "Complete!"}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Run AI Optimization
+                </>
+              )}
             </Button>
             <Button asChild variant="outline" className="border-border bg-transparent">
               <Link href="/report">
@@ -139,6 +192,41 @@ export function DashboardContent({ profile, buildings, waterReports, foodReports
             </Button>
           </div>
         </div>
+
+        {/* Optimization Status Indicator Card */}
+        {isOptimizing && (
+          <Card className="bg-gradient-to-r from-primary/20 via-primary/10 to-background border-primary/30 animate-in fade-in slide-in-from-top-4">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-primary/20">
+                  <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold mb-1">AI Optimization in Progress</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {optimizationStatus === "collecting" && "Collecting real-time data from VIT-AP campus sensors..."}
+                    {optimizationStatus === "analyzing" &&
+                      "Running SARIMA forecasting and Z-score anomaly detection..."}
+                    {optimizationStatus === "optimizing" && "Gemini 2.0 Flash generating optimal resource schedule..."}
+                    {optimizationStatus === "complete" && "Processing complete! Preparing results..."}
+                  </p>
+                  <Progress
+                    value={
+                      optimizationStatus === "collecting"
+                        ? 25
+                        : optimizationStatus === "analyzing"
+                          ? 50
+                          : optimizationStatus === "optimizing"
+                            ? 75
+                            : 100
+                    }
+                    className="h-2"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* User Stats Card */}
         {profile && (

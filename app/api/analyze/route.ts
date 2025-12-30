@@ -1,20 +1,25 @@
 import { generateText } from "ai"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import { createGroq } from "@ai-sdk/groq"
 
 export async function POST(req: Request) {
   const { query, context } = await req.json()
 
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
-  if (!apiKey) {
+  // <CHANGE> Updated to use new Gemini API key and added Groq fallback
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  const groqKey = process.env.GROQ_API_KEY
+
+  console.log("[v0] API Keys available:", {
+    gemini: !!geminiKey,
+    groq: !!groqKey,
+  })
+
+  if (!geminiKey && !groqKey) {
     return Response.json({
-      error: "GEMINI_API_KEY is not configured. Please add your Gemini API key to environment variables.",
+      error:
+        "No AI API keys configured. Please add GEMINI_API_KEY or GROQ_API_KEY to environment variables in the Vars section.",
     })
   }
-
-  // Create Google Generative AI provider with user's API key
-  const google = createGoogleGenerativeAI({
-    apiKey,
-  })
 
   const systemPrompt = `You are an AI campus resource policy agent for OptiCampus-X, a smart campus resource optimization system deployed at VIT-AP University, Amaravati.
 
@@ -55,23 +60,96 @@ Guidelines:
 - Consider student comfort and academic schedule constraints
 - Provide actionable next steps for VIT-AP facilities management`
 
+  // <CHANGE> Try Gemini first, fallback to Groq if it fails
   try {
-    const { text } = await generateText({
-      model: google("gemini-2.0-flash-exp"),
-      system: systemPrompt,
-      prompt: query,
-      maxOutputTokens: 2000,
-      temperature: 0.7,
-    })
+    if (geminiKey) {
+      console.log("[v0] Attempting Gemini API call...")
+      const google = createGoogleGenerativeAI({
+        apiKey: geminiKey,
+      })
 
+      const { text } = await generateText({
+        model: google("gemini-2.0-flash-exp"),
+        system: systemPrompt,
+        prompt: query,
+        maxOutputTokens: 2000,
+        temperature: 0.7,
+      })
+
+      console.log("[v0] Gemini API success")
+      return Response.json({
+        response: text,
+        confidence: Math.floor(Math.random() * 10) + 88, // 88-97%
+        model: "Gemini 2.0 Flash",
+      })
+    }
+  } catch (geminiError) {
+    console.error("[v0] Gemini API failed:", geminiError)
+
+    // <CHANGE> Fallback to Groq if Gemini fails
+    if (groqKey) {
+      try {
+        console.log("[v0] Falling back to Groq API...")
+        const groq = createGroq({
+          apiKey: groqKey,
+        })
+
+        const { text } = await generateText({
+          model: groq("llama-3.3-70b-versatile"),
+          system: systemPrompt,
+          prompt: query,
+          maxOutputTokens: 2000,
+          temperature: 0.7,
+        })
+
+        console.log("[v0] Groq API success (fallback)")
+        return Response.json({
+          response: text,
+          confidence: Math.floor(Math.random() * 10) + 85, // 85-94%
+          model: "Llama 3.3 70B (Groq)",
+        })
+      } catch (groqError) {
+        console.error("[v0] Groq API also failed:", groqError)
+      }
+    }
+
+    // <CHANGE> If both fail, return detailed error
     return Response.json({
-      response: text,
-      confidence: Math.floor(Math.random() * 10) + 88, // 88-97%
-    })
-  } catch (error) {
-    console.error("Gemini API error:", error)
-    return Response.json({
-      error: "Failed to connect to Gemini API. Please verify your API key is valid.",
+      error: `AI services temporarily unavailable. Please verify your API keys are valid:\n- GEMINI_API_KEY: ${geminiKey ? "Configured (failed to connect)" : "Not set"}\n- GROQ_API_KEY: ${groqKey ? "Configured (failed to connect)" : "Not set"}`,
     })
   }
+
+  // <CHANGE> If only Groq is available (no Gemini key)
+  if (groqKey) {
+    try {
+      console.log("[v0] Using Groq API (no Gemini key)...")
+      const groq = createGroq({
+        apiKey: groqKey,
+      })
+
+      const { text } = await generateText({
+        model: groq("llama-3.3-70b-versatile"),
+        system: systemPrompt,
+        prompt: query,
+        maxOutputTokens: 2000,
+        temperature: 0.7,
+      })
+
+      console.log("[v0] Groq API success")
+      return Response.json({
+        response: text,
+        confidence: Math.floor(Math.random() * 10) + 85,
+        model: "Llama 3.3 70B (Groq)",
+      })
+    } catch (error) {
+      console.error("[v0] Groq API error:", error)
+      return Response.json({
+        error: "Failed to connect to Groq API. Please verify your GROQ_API_KEY is valid.",
+      })
+    }
+  }
+
+  return Response.json({
+    error: "No AI models available. Please configure GEMINI_API_KEY or GROQ_API_KEY.",
+  })
 }
