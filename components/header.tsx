@@ -186,7 +186,10 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="gap-2 text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="gap-2 text-destructive focus:text-destructive cursor-pointer"
+                >
                   <LogOut className="h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
@@ -221,6 +224,19 @@ export function Header() {
                 </Button>
               </Link>
             ))}
+            {user && (
+              <>
+                <div className="h-px bg-border my-2" />
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Log out
+                </Button>
+              </>
+            )}
             {!user && (
               <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 mt-2">
                 <Link href="/auth/login">Sign In</Link>
