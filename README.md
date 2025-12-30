@@ -183,11 +183,10 @@ Unlike typical AI projects that use LLMs for everything, OptiCampus-X uses Gemin
 - **Executive Reporting**: Generates professional summaries for stakeholders automatically
 
 ## Team
-
-- **V C Premchand Yadav** - Team Leader, Backend Development & AI Integration
+- **Sanjana Pasam** - Team Leader, Web Developer
+- **V C Premchand Yadav** - Backend Development & AI Integration
 - **P R Kiran Kumar Reddy (Kiran)** - Generalist, Supabase & API Integration
 - **Edupulapati Sai Praneeth** - AI/ML/DL Specialist
-- **Sanjana Pasam** - Web Developer
 
 ## Contributing
 
